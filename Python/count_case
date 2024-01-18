@@ -1,0 +1,15 @@
+text = "The Geek King"
+
+uppercase=0
+lowercase=0
+
+for i in text:
+if (i>='A' and i<='Z'):
+    
+        uppercase=uppercase+1
+            
+    if(i>='a' and i<='z'):
+        lowercase=lowercase+1
+
+print('Lower case characters: ',lowercase)
+print('Upper case characters: ',uppercase)
