@@ -1,0 +1,16 @@
+def case_counter(text):
+    uppercase = 0
+    lowercase = 0
+
+    for i in text:
+        if 'A' <= i <= 'Z':
+            uppercase += 1
+        elif 'a' <= i <= 'z':
+            lowercase += 1
+
+    return uppercase, lowercase
+
+result = case_counter("Hello World!")
+
+print('Uppercase letters:', result[0])
+print('Lowercase letters:', result[1])
