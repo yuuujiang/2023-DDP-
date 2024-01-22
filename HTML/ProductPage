@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+    <title>Document</title>
+  
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+    <nav id="breadcrumbs">
+        <ul>
+            <li><a href="#">HOME</a></li>
+            <li><a href="#">Accessories</a></li>
+            <li><a href="#">Socks</a></li>
+        </ul>
+    </nav>
+
+    <h1 class="product-title">Union Jack Socks</h1>
+    
+    <section class="product-image">
+        <img src="https://p3.itc.cn/images01/20230322/382dddedd0924d94833c4a1cd5b5d4ba.jpeg" alt="Union Jack Socks" width="400px">
+
+    </section>
+
+    <section class="product-options">
+        <div class="size-options">
+            <button>6-10</button>
+            <button>10.5-13</button>
+        </div>
+
+        <div class="quality-opyions">
+         <lable for="quality">Quality</lable>
+         <select name="quality" id="quality">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </div>
+        </select>
+
+
+        <p class="product-price">$20.00</p>
+        <button>Add to bag</button>
+    </section>
+    
+    <section>
+        <h2>product description</h2>
+        <p>descripton1111descripton1111descripton1111descripton1111descripton1111descripton1111descripton1111</p>
+        <ul>
+            <li>product feature</li>
+            <li>product feature</li>
+            <li>product feature</li>
+            <li>product feature</li>
+
+        </ul>
+    </section>
+    <table>
+        <thead>
+            <tr>
+                <th>Delivery option</th>
+                <th>Price</th>
+                <th>Delivery Day</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Next Day Delivery</td>
+                <td>$10.00</td>
+                <td>01/03/2024</td>
+            </tr>
+            <tr>
+                <td>Standary Delivery</td>
+                <td>$5.00</td>
+                <td>06/03/2024</td>
+            </tr>
+            <tr>
+                <td>Click and Collect</td>
+                <td>free</td>
+                <td>Same day</td>
+            </tr>
+        </tbody>
+    </table>
+    <section>
+        <h2>Reviews</h2>
+        <article>
+            <h3>User1</h3>
+            <p>★★★★</p>
+            <p>This product is good</p>
+        </article>
+
+    </section>
+</body>
+</html>
