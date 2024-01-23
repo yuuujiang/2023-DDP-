@@ -1,1 +1,50 @@
-P
+bag={}
+
+
+def login():
+    user_name = input('Please enter your username:')
+    password = input('Please enter your password:')
+    if user_name in bag.keys():
+        if password==bag[user_name]:
+            print("Login successful")
+        else:
+          print("The username or password you entered is incorrect.")  
+    else:
+       print("Account does not exist.") 
+
+
+
+def register():
+    user_name = input('Please enter your username:')
+    password = input('Please enter your password:')
+    password_again = input('Please confirm your password:')
+    if password==password_again:
+        bag[user_name]=password
+        print("Registration successful.")
+    else:
+        print("Passwords do not match. Please re-enter.")
+
+
+
+def page():
+
+    print('WELCOME')
+    print('1. LOGIN')
+    print('2. REGISTER')
+
+user_choice=int(input("Enter your choice: "))
+
+if user_choice==1:
+    login()
+elif user_choice==2:
+    register()
+else:
+    print('Invalid choice.')
+
+
+def start():
+    while True:
+        page()
+
+if __name__ == '__main__':
+    start()
