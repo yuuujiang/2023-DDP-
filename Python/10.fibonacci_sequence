@@ -1,1 +1,22 @@
+def fibonacci_sequence(max_value):
+    # Your code goes here
+    # Implement the Fibonacci sequence calculation using a while loop
+    pass  # Delete this after implementing some code inside this function
+    fib_sequence=[]
+    a,b=1,0
+    
+    while a<=max_value:
+        fib_sequence.append(a)
+        a,b=b,a+b
+    return fib_sequence
+        
+        
 
+
+
+
+# Test cases
+print(fibonacci_sequence(10))  # Expected output: [0, 1, 1, 2, 3, 5, 8]
+print(fibonacci_sequence(1))  # Expected output: [0, 1, 1]
+print(fibonacci_sequence(0))  # Expected output: [0]
+print(fibonacci_sequence(-5))  # Expected: Empty list or error message
