@@ -4,7 +4,8 @@ def compound_interest_calculator(P, r, n, t):
         return "Invalid input. Please make sure that Principal, Rate, Compounding frequency, and Time are all greater than zero."
 
 
-    A = P * (1 + r/n)**(n*t)
+    else:
+        A = P * (1 + r/n)**(n*t)
     
     return round(A, 2)  
 
