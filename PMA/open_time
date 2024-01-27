@@ -1,0 +1,27 @@
+from datetime import datetime, timedelta
+
+def is_shop_open():
+    current_time = datetime.now()
+    weekday = current_time.weekday()  # 0表示周一，6表示周日
+
+    if 0 <= weekday <= 5:  # 周一到周六
+        opening_time = datetime(current_time.year, current_time.month, current_time.day, 10, 0)
+        closing_time = datetime(current_time.year, current_time.month, current_time.day, 20, 0)
+    elif weekday == 6:  # 周日
+        opening_time = datetime(current_time.year, current_time.month, current_time.day, 12, 0)
+        closing_time = datetime(current_time.year, current_time.month, current_time.day, 15, 0)
+    else:
+        # 商店周日不营业
+        return f"The store is closed. The next opening time is: 周一 10:00"
+
+    if opening_time <= current_time <= closing_time:
+        return "营业中"
+    else:
+        # 商店当前不营业，输出下一次营业时间
+        next_opening_time = opening_time if current_time < opening_time else opening_time + timedelta(days=1)
+        next_opening_day = "周一" if weekday == 6 else current_time.strftime("%A")  # 如果当前是周日，下一次开业是周一
+        return f"The store is closed. The next opening time is: {next_opening_day} 10:00"
+
+# 调用函数判断商店是否营业
+result = is_shop_open()
+print(result)
