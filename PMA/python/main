@@ -1,0 +1,161 @@
+# Import dependencies -- reuse code others have given us.
+import sqlite3
+import os
+from markupsafe import escape
+import datetime
+from flask import Flask, render_template, request, url_for, redirect, abort, g
+
+app = Flask("app")
+user_id = 0
+user_name = None
+
+# The database configuration
+DATABASE = os.environ.get("FLASK_DATABASE", "add.db")
+
+
+# Functions to help connect to the database
+# And clean up when this application ends.
+def get_db_connection():
+    db = getattr(g, "_database", None)
+    if db is None:
+        db = g._database = sqlite3.connect("/Users/zhangyx/Desktop/add.db")
+    return db
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, "_database", None)
+    if db is not None:
+        db.close()
+
+
+# Each @app.route(...) indicates a URL.
+# Using that URL causes the function immediately after the @app.route(...) line to run.
+@app.route("/")
+@app.route("/index/")
+def index():
+    global user_name
+    print("user_name: ", user_name)
+    conn = sqlite3.connect("./add.db")
+    cursor = conn.cursor()
+    supps = cursor.execute(
+        "SELECT * FROM dining_categories ORDER BY category_id"
+    )
+    categories = cursor.fetchall()
+    all_data = {}
+    for category in categories:
+        print("categorie: ", category[1])
+        supps = cursor.execute(
+            "SELECT * FROM dining_information WHERE dining_category = '{}' ".format(category[1])
+        )
+        data = cursor.fetchall()
+        all_data[category[1]] = data
+    conn.commit()
+    conn.close()
+    return render_template("index.html", all_data=all_data, user_name=user_name)
+
+
+@app.route("/login/", methods=("GET", "POST"))
+def login():
+    global user_name
+    global user_id
+    error = None
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        print(username, password)
+        conn = sqlite3.connect("./add.db")
+        cursor = conn.cursor()
+        supps = cursor.execute(
+            "SELECT * FROM customer_information WHERE uesr_name = '{}' ".format(user_name)
+        )
+        customer_information = cursor.fetchall()
+        conn.commit()
+        conn.close()
+        if len(customer_information) == 0:
+            error = "Can not find username! "
+        elif password != customer_information[0][3]:
+            error = "Password Error! "
+        else:
+            print("password correct")
+            user_name = username
+            user_id = customer_information[0][0]
+            return redirect(url_for("index"))
+    return render_template("login.html", error = error)
+
+
+@app.route("/detailpage/")
+def detailpage(): 
+    conn = sqlite3.connect("./add.db")
+    cursor = conn.cursor()
+    supps = cursor.execute(
+        """
+        SELECT uesr_name, a.*
+        FROM
+            (
+                SELECT * 
+                FROM customer_review 
+                WHERE dining_id = 2 
+            )a
+            inner join
+            (
+                SELECT customer_id, uesr_name
+                FROM customer_information
+            )b
+            on a.customer_id == b.customer_id
+        """
+    )
+    datas = cursor.fetchall()
+    conn.commit()
+    conn.close()
+    return render_template("detailpage.html", datas=datas)
+
+    
+@app.route("/write_review/", methods=("GET", "POST"))
+def write_review(): 
+    conn = sqlite3.connect("./add.db")
+    cursor = conn.cursor()
+    supps = cursor.execute(
+        "SELECT max(review_id) as review_id FROM customer_review"
+    )
+    datas = cursor.fetchall()
+    conn.commit()
+    conn.close()
+
+    review_id = datas[0][0] + 1
+    print(review_id)
+    dining_id = 2
+    if request.method == "POST":
+        # data = request.json
+        # selected_rating = data.get('rating')
+        # selected_rating = request.form["rating"]
+        selected_rating = request.form.get('rating')
+        print(request.form["content"])
+        print(selected_rating)
+        print(request.form["avg_cost"])
+        # conn = get_db_connection()
+        conn = sqlite3.connect("./add.db")
+        cursor = conn.cursor()
+        supps = cursor.execute(
+            "INSERT INTO customer_review VALUES (?,?,?,?,?,3,null,?)",
+            (
+                review_id,
+                user_id,
+                dining_id,
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                request.form["content"],
+                # selected_rating,
+                # request.form["picture"],
+                request.form["avg_cost"]
+            ),
+        )
+        conn.commit()
+        conn.close()
+        return redirect(url_for("detailpage"))
+        # return render_template("detailpage.html")
+    return render_template("write_review.html")
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
