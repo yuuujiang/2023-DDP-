@@ -7,8 +7,8 @@ def index():
     search_query = ''
     if request.method == 'POST':
         search_query = request.form.get('search')
-        # 在这里处理搜索逻辑，例如查询数据库
-        # 示例：results = search_database(search_query)
+        # handle the search logic, such as querying a database.
+
     return render_template_string('''
         <!DOCTYPE html>
         <html>
@@ -22,7 +22,7 @@ def index():
             </form>
             {% if search_query %}
                 <p>You searched for: {{ search_query }}</p>
-                <!-- 在这里展示搜索结果 -->
+                <!-- Display search results here -->
             {% endif %}
         </body>
         </html>
@@ -30,4 +30,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
