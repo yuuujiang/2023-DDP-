@@ -1,1 +1,33 @@
+from flask import Flask, render_template_string, request
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    search_query = ''
+    if request.method == 'POST':
+        search_query = request.form.get('search')
+        # 在这里处理搜索逻辑，例如查询数据库
+        # 示例：results = search_database(search_query)
+    return render_template_string('''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Search Bar Example</title>
+        </head>
+        <body>
+            <form method="POST">
+                <input type="text" name="search" placeholder="Enter search terms...">
+                <input type="submit" value="Search">
+            </form>
+            {% if search_query %}
+                <p>You searched for: {{ search_query }}</p>
+                <!-- 在这里展示搜索结果 -->
+            {% endif %}
+        </body>
+        </html>
+    ''', search_query=search_query)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
