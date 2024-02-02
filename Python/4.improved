@@ -1,0 +1,15 @@
+def word_filter_counter(text, filter_words):
+    text = text.lower()
+    word_counts = {}
+    
+    for filter_word in filter_words:
+        count = text.count(filter_word.lower())
+        if count > 0:
+            word_counts[filter_word] = count
+    
+    return word_counts
+
+print(word_filter_counter("Hello world, hello!", ["hello"]))
+print(word_filter_counter("The quick brown fox.", ["the"]))
+print(word_filter_counter("Is this real life? Is this just fantasy?", ["is", "this", "just"]))
+print(word_filter_counter("Do we see the big picture or just small details?", ["we", "the", "or"]))
