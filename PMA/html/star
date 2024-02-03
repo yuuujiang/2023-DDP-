@@ -1,108 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Write Review</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <style>
-        /* 添加星星图标样式 */
-        .rating {
-            display: flex;
-            cursor: pointer;
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+      <style>
+        body {
+            background-color: #f8f9fa;
         }
 
-        .star {
-            font-size: 2em;
-            color: gray;
-            transition: color 0.5s;
+        h1, h2 {
+            color: #007bff; 
         }
 
-        .star.active {
-            color: gold !important;
+        label {
+            color: #007bff;
+        }
+
+        .btn-primary {
+            background-color: #007bff; 
+            border-color: #007bff; 
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3; 
+            border-color: #0056b3; 
         }
     </style>
 </head>
-
-<body>
-
-    <h1>Restaurant Rating</h1>
-
-    <div class="rating" onclick="handleRating(event)">
-        <div class="star" data-value="1">&#9733;</div>
-        <div class="star" data-value="2">&#9733;</div>
-        <div class="star" data-value="3">&#9733;</div>
-        <div class="star" data-value="4">&#9733;</div>
-        <div class="star" data-value="5">&#9733;</div>
+<body class="container">
+{% block content %}
+    <div class="mt-5">
+        <h1 class="text-center">{% block title %} Write Review {% endblock %}</h1>
     </div>
 
-    <p id="selectedRating">Selected Rating: 0</p>
-
-    <script>
-        function handleRating(event) {
-            const selectedStar = event.target;
-            if (selectedStar.classList.contains('star')) {
-                const ratingValue = selectedStar.getAttribute('data-value');
-                document.getElementById('selectedRating').innerText = `Selected Rating: ${ratingValue}`;
-                resetStars();
-                highlightStars(ratingValue);
-            }
-        }
-
-        function resetStars() {
-            const stars = document.querySelectorAll('.star');
-            stars.forEach(star => {
-                star.classList.remove('active');
-            });
-        }
-
-        function highlightStars(count) {
-            const stars = document.querySelectorAll('.star');
-            for (let i = 0; i < count; i++) {
-                stars[i].classList.add('active');
-            }
-        }
-    </script>
-    <div class="mb-3">
-        <h2>Text Review</h2>
-        <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-    </div>
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+            <form method="post">
+                <div class="mb-3">
+                    <label for="rating" class="form-label"><h2>Restaurant Rating</h2></label>
+                    <select class="form-select form-select-lg" name="rating" aria-label="Large select example"
+                        >{{ request.form['rating'] }}>
+                        <option selected>Please Select your Rating</option>
+                        <option value="1">★</option>
+                        <option value="2">★★</option>
+                        <option value="3">★★★</option>
+                        <option value="4">★★★★</option>
+                        <option value="5">★★★★★</option>
+                    </select>
+                </div>
 
 
-    <div class="mb-3">
-        <h2>Picture review</h2>
-        <label for="formFile" class="form-label">Default file input example</label>
-        <input class="form-control" type="file" id="formFile">
-    </div>
+            <div class="mb-3">
+                <label for="content" class="form-label"><h2>Text Review</h2></label>
+                <textarea name="content"
+                        placeholder="Text Review"
+                        rows="5"
+                        cols="60"
+                        >{{ request.form['content'] }}</textarea>
+            </div>
 
+            <div class="mb-3">
+                <label for="avg_cost"><h2>Average Cost：(￡)</h2></label>
+                <input type="number" name="avg_cost"
+                value="{{ request.form['avg_cost'] }}"></input>
+            </div>
 
-    <div>
-        <h2>Average Cost</h2>
-        <input type="radio" class="btn-check" name="options-base" id="option1" autocomplete="off" checked>
-        <label class="btn" for="option1">£1-10</label>
-
-        <input type="radio" class="btn-check" name="options-base" id="option2" autocomplete="off">
-        <label class="btn" for="option2">£10-20</label>
-
-        <input type="radio" class="btn-check" name="options-base" id="option3" autocomplete="off">
-        <label class="btn" for="option3">£20-30</label>
-
-        <input type="radio" class="btn-check" name="options-base" id="option4" autocomplete="off" checked>
-        <label class="btn" for="option4">£30-40</label>
-
-        <input type="radio" class="btn-check" name="options-base" id="option5" autocomplete="off">
-        <label class="btn" for="option5">£40-50</label>
-
-        <input type="radio" class="btn-check" name="options-base" id="option6" autocomplete="off">
-        <label class="btn" for="option6">£50-100</label>
-
-    </div>
-
-    <button type="button" class="btn btn-primary">Submit Rewiew</button>
-
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>   
+    </div>   
+{% endblock %}
 </body>
-
 </html>
