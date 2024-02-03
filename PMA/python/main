@@ -1,27 +1,27 @@
-# Import dependencies -- reuse code others have given us.
+# Import necessary libraries and modules
 import sqlite3
 import os
 from markupsafe import escape
 import datetime
 from flask import Flask, render_template, request, url_for, redirect, abort, g
 
+# Initialize Flask application
 app = Flask("app")
 user_id = 0
 user_name = None
 
-# The database configuration
+# Database configuration, getting from environment variable or using default
 DATABASE = os.environ.get("FLASK_DATABASE", "add.db")
 
 
-# Functions to help connect to the database
-# And clean up when this application ends.
+# Function to help connect to the database
 def get_db_connection():
     db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect("/Users/zhangyx/Desktop/add.db")
     return db
 
-
+# Function to close database connection when the application context ends
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, "_database", None)
@@ -29,24 +29,26 @@ def close_connection(exception):
         db.close()
 
 
-# Each @app.route(...) indicates a URL.
-# Using that URL causes the function immediately after the @app.route(...) line to run.
+# Route for the homepage
 @app.route("/")
 @app.route("/index/")
 def index():
+    global user_id
     global user_name
     print("user_name: ", user_name)
     conn = sqlite3.connect("./add.db")
     cursor = conn.cursor()
+    # Query all dining categories
     supps = cursor.execute(
         "SELECT * FROM dining_categories ORDER BY category_id"
     )
     categories = cursor.fetchall()
     all_data = {}
+    # For each category, query corresponding dining information
     for category in categories:
         print("categorie: ", category[1])
         supps = cursor.execute(
-            "SELECT * FROM dining_information WHERE dining_category = '{}' ".format(category[1])
+            "SELECT * FROM dining_information WHERE dining_category = '{}' ".format(category[0])
         )
         data = cursor.fetchall()
         all_data[category[1]] = data
@@ -54,7 +56,7 @@ def index():
     conn.close()
     return render_template("index.html", all_data=all_data, user_name=user_name)
 
-
+# Route for login
 @app.route("/login/", methods=("GET", "POST"))
 def login():
     global user_name
@@ -66,15 +68,18 @@ def login():
         print(username, password)
         conn = sqlite3.connect("./add.db")
         cursor = conn.cursor()
+        # Query user information
         supps = cursor.execute(
-            "SELECT * FROM customer_information WHERE uesr_name = '{}' ".format(user_name)
+            "SELECT * FROM customer_information WHERE user_name = '{}' ".format(username)
         )
         customer_information = cursor.fetchall()
+        print(customer_information)
         conn.commit()
         conn.close()
+         # Validate username and password
         if len(customer_information) == 0:
             error = "Can not find username! "
-        elif password != customer_information[0][3]:
+        elif password != customer_information[0][2]:
             error = "Password Error! "
         else:
             print("password correct")
@@ -83,23 +88,76 @@ def login():
             return redirect(url_for("index"))
     return render_template("login.html", error = error)
 
+# Route for registration
+@app.route("/register/", methods=("GET", "POST"))
+def register():
+    global user_name
+    global user_id
+    error = None
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        repassword = request.form["repassword"]
+        print(username, password)
+        conn = sqlite3.connect("./add.db")
+        cursor = conn.cursor()
+        # Check if username already exists
+        supps = cursor.execute(
+            "SELECT * FROM customer_information WHERE user_name = '{}' ".format(username)
+        )
+        customer_information = cursor.fetchall()
+        print(customer_information)
+        # Validate password and other registration information
+        if len(customer_information) > 0:
+            error = "Username has  Existed!"
+        elif password != repassword:
+            error = "Password is inconsistent, please re-enter!"
+        elif len(password) < 8:
+            error = "Password is too short"
+        elif not str.isalnum(password) or str.isdigit(password) or str.isalpha(password):
+            error = "Password must be letters and numbers"
+        else:
+            # Insert new user information
+            supps = cursor.execute(
+                "SELECT max(customer_id) as customer_id FROM customer_information"
+            )
+            data = cursor.fetchall()
+            customer_id = data[0][0] + 1
+            supps = cursor.execute(
+                "INSERT INTO customer_information VALUES (?,?,?,?)",
+                (
+                    customer_id,
+                    username,
+                    password,
+                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                ),
+            )
+            user_name = username
+            user_id = customer_id
+            conn.commit()
+            conn.close()
+            return redirect(url_for("index"))
+        conn.commit()
+        conn.close()
+    return render_template("register.html", error = error)
 
+# Route for the detail page
 @app.route("/detailpage/")
 def detailpage(): 
     conn = sqlite3.connect("./add.db")
     cursor = conn.cursor()
     supps = cursor.execute(
         """
-        SELECT uesr_name, a.*
+        SELECT user_name, a.*
         FROM
             (
                 SELECT * 
                 FROM customer_review 
-                WHERE dining_id = 2 
+                WHERE dining_id = 1 
             )a
             inner join
             (
-                SELECT customer_id, uesr_name
+                SELECT customer_id, user_name
                 FROM customer_information
             )b
             on a.customer_id == b.customer_id
@@ -110,9 +168,11 @@ def detailpage():
     conn.close()
     return render_template("detailpage.html", datas=datas)
 
-    
+# Route for writing reviews    
 @app.route("/write_review/", methods=("GET", "POST"))
 def write_review(): 
+    global user_name
+    global user_id
     conn = sqlite3.connect("./add.db")
     cursor = conn.cursor()
     supps = cursor.execute(
@@ -124,11 +184,8 @@ def write_review():
 
     review_id = datas[0][0] + 1
     print(review_id)
-    dining_id = 2
+    dining_id = 1
     if request.method == "POST":
-        # data = request.json
-        # selected_rating = data.get('rating')
-        # selected_rating = request.form["rating"]
         selected_rating = request.form.get('rating')
         print(request.form["content"])
         print(selected_rating)
@@ -137,22 +194,20 @@ def write_review():
         conn = sqlite3.connect("./add.db")
         cursor = conn.cursor()
         supps = cursor.execute(
-            "INSERT INTO customer_review VALUES (?,?,?,?,?,3,null,?)",
+            "INSERT INTO customer_review VALUES (?,?,?,?,?,?,null,?)",
             (
                 review_id,
                 user_id,
                 dining_id,
                 datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                 request.form["content"],
-                # selected_rating,
-                # request.form["picture"],
+                selected_rating,
                 request.form["avg_cost"]
             ),
         )
         conn.commit()
         conn.close()
         return redirect(url_for("detailpage"))
-        # return render_template("detailpage.html")
     return render_template("write_review.html")
 
 
